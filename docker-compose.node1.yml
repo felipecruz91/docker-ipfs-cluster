@@ -1,0 +1,35 @@
+version: "3.4"
+
+services:
+  node1:
+    container_name: node1
+    image: ipfs/ipfs-cluster:1.0.4
+    command:
+      [
+        "daemon",
+        "--bootstrap",
+        "/ip4/${NODE0_IP_ADDRESS:?err}/tcp/9096/p2p/${NODE0_PEER_ID:?err}",
+      ]
+    depends_on:
+      - ipfs0
+    environment:
+      CLUSTER_PEERNAME: node1
+      CLUSTER_SECRET: ${CLUSTER_SECRET:?err}
+      CLUSTER_IPFSHTTP_NODEMULTIADDRESS: /dns4/172.25.0.2/tcp/5001
+      CLUSTER_CRDT_TRUSTEDPEERS: "*" # Trust all peers in Cluster
+      CLUSTER_RESTAPI_HTTPLISTENMULTIADDRESS: /ip4/0.0.0.0/tcp/9094 # Expose API
+      CLUSTER_MONITORPINGINTERVAL: 2s # Speed up peer discovery
+      IPFS_BOOTSTRAP_RM_ALL: "true"
+      IPFS_API: /ip4/172.25.0.2/tcp/5001
+    ports:
+      - "127.0.0.1:9094:9094" # HTTP API port (allows ipfs-cluster-ctl usage on host)
+      - "9095:9095" # Cluster IPFS Proxy endpoint
+      - "9096:9096" # Cluster Swarm endpoint which should be open and diallable by other cluster peers.
+    networks:
+      ipfs-docker_default:
+        ipv4_address: 172.25.0.3
+    volumes:
+      - node1-peer-data:/data/ipfs-cluster
+
+volumes:
+  node1-peer-data:
