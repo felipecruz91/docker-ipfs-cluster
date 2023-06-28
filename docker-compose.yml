@@ -20,7 +20,16 @@ services:
     networks:
       ipfs-docker_default:
         ipv4_address: 172.25.0.2
-
+  ipdr:
+    container_name: ipdr
+    image: felipecruz/ipdr-server@sha256:1521cd94e12ff5e01e5f12277894eae8252fdd1fc4c28cf8ea327eb733db30c3
+    entrypoint: /go/bin/ipdr
+    command: server -p 5000 --ipfs-gateway http://ipfs0:8080 --ipfs-host http://ipfs0:5001
+    ports:
+      - "5000:5000"
+    networks:
+      ipfs-docker_default:
+        ipv4_address: 172.25.0.4
 volumes:
   ipfs0-data:
 
